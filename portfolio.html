@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeong Been Lee - Portfolio</title>
+    <style>
+        /* 웹페이지 전체의 기본 폰트와 여백 설정 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #000;
+            background-color: #fff;
+            line-height: 1.5;
+            padding: 80px 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* 상단 영역 (이름, 역할, 연락처) */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 120px;
+        }
+        .header .name-section h1 {
+            font-size: 2.5rem;
+            font-weight: normal;
+            line-height: 1.3;
+        }
+        .header .name-section .role {
+            font-size: 1rem;
+            margin-top: 40px;
+        }
+        .header .contact-section {
+            display: flex;
+            gap: 60px;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+        .contact-table {
+            border-collapse: collapse;
+        }
+        .contact-table td {
+            padding-bottom: 6px;
+            vertical-align: top;
+        }
+        .contact-table td:first-child {
+            padding-right: 15px;
+        }
+        .contact-table a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* 중간 영역 (프로젝트, 학력 2단 분리) */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 100px;
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: normal;
+            text-decoration: underline;
+            margin-bottom: 30px;
+        }
+        
+        /* 리스트 아이템 기본 형태 및 Hover 효과 */
+        .list-item {
+            display: flex;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            transition: opacity 0.2s ease;
+        }
+        /* 클릭 가능한 프로젝트 아이템에만 마우스 커서와 효과 적용 */
+        .project-item {
+            cursor: pointer;
+            padding: 10px;
+            margin-left: -10px;
+            border-radius: 8px;
+        }
+        .project-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .list-item .date {
+            width: 100px;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+        .list-item .details p {
+            margin-bottom: 4px;
+        }
+        .project-title {
+            font-weight: bold;
+            margin-bottom: 6px !important;
+        }
+
+        /* 하단 영역 (스킬, 언어, 연도, 페이지 번호) */
+        .bottom-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            position: relative;
+        }
+        .right-column {
+            grid-column: 2;
+        }
+        .right-column section {
+            margin-bottom: 50px;
+        }
+        .right-column .desc-text {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        /* 왼쪽 하단 2026 회전 텍스트 */
+        .year-stamp {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            font-size: 2.2rem;
+            transform: rotate(-90deg);
+            transform-origin: left bottom;
+            letter-spacing: 2px;
+        }
+
+        /* 오른쪽 하단 페이지 번호 */
+        .page-num {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        /* =========================================
+           모달(팝업) 관련 CSS 추가
+           ========================================= */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        .modal-body img, .modal-body video {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .modal-desc {
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .modal-desc h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="name-section">
+            <h1>Jeong Been<br>Lee</h1>
+            <p class="role">iOS Developer</p>
+        </div>
+        <div class="contact-section">
+            <div>
+                <p>294 Suyeong-ro</p>
+                <p>Namgu, Busan, South Korea</p>
+            </div>
+            <div>
+                <table class="contact-table">
+                    <tr>
+                        <td>e</td>
+                        <td><a href="mailto:computar7@naver.com">computar7@naver.com</a></td>
+                    </tr>
+                    <tr>
+                        <td>m</td>
+                        <td>+82 10 6664 9388</td>
+                    </tr>
+                    <tr>
+                        <td>g</td>
+                        <td><a href="https://github.com/232JBJBJB" target="_blank">https://github.com/232JBJBJB</a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- 왼쪽 단: Projects -->
+        <section>
+            <h2 class="section-title">Projects</h2>
+            
+            <!-- LearnSpot 프로젝트 (클릭 이벤트 연결) -->
+            <div class="list-item project-item" onclick="openModal('learnspot')">
+                <div class="date">2025-current</div>
+                <div class="details">
+                    <p class="project-title">LearnSpot / AR & AI Language Learning Platform</p>
+                    <p>iOS Developer (Main Programmer)</p>
+                    <p style="color: #888; font-size: 0.75rem; margin-top: 8px;">* Click to view details</p>
+                </div>
+            </div>
+
+            <!-- Solar Tracker 프로젝트 (클릭 이벤트 연결) -->
+            <div class="list-item project-item" onclick="openModal('solar')">
+                <div class="date">2026-2026</div>
+                <div class="details">
+                    <p class="project-title">Smart Solar Tracker / iOS-Integrated Hardware Project</p>
+                    <p>iOS Developer & Hardware Integrator</p>
+                    <p style="color: #888; font-size: 0.75rem; margin-top: 8px;">* Click to view details</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 오른쪽 단: Education -->
+        <section>
+            <h2 class="section-title">Education</h2>
+            <div class="list-item">
+                <div class="date">2021-2026</div>
+                <div class="details">
+                    <p>Kyungsung University / Busan, South Korea</p>
+                    <p>Bachelor of Engineering in Electronic Engineering &</p>
+                    <p>Bachelor of Science in Computer Science (Double Major)</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="bottom-content">
+        <div class="year-stamp">2026</div>
+        
+        <div class="right-column">
+            <section>
+                <h2 class="section-title">Skills</h2>
+                <p class="desc-text">Languages & Frameworks: Swift, SwiftUI, C++, iOS SDK</p>
+                <p class="desc-text">Architecture & Tools: MVVM Architecture, Git, Asynchronous</p>
+                <p class="desc-text">Programming (async/await)</p>
+                <p class="desc-text">Core Competencies: Automated Testing, Debugging, Problem</p>
+                <p class="desc-text">Solving</p>
+            </section>
+
+            <section>
+                <h2 class="section-title">Languages</h2>
+                <p class="desc-text">Korean: Native</p>
+                <p class="desc-text">Japanese: Professional proficiency (JLPT N1)</p>
+                <p class="desc-text">English: Intermediate proficiency</p>
+                <p class="desc-text">Chinese: Intermediate proficiency</p>
+            </section>
+        </div>
+
+        <div class="page-num">1 &frasl; 1</div>
+    </div>
+
+    <!-- =========================================
+         모달(팝업) HTML 구조
+         ========================================= -->
+    <div id="projectModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalBody" class="modal-body">
+                <!-- 자바스크립트를 통해 내용이 여기에 들어갑니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 프로젝트별 모달에 들어갈 데이터 (사진, 동영상 및 텍스트)
+        const modalData = {
+            'learnspot': {
+                media: '<img src="IMG_6744.PNG" alt="LearnSpot Object Recognition UI">',
+                title: 'LearnSpot - AR & AI Language Learning',
+                description: '실시간 객체 인식 기술을 활용하여 사물의 이름과 병음, 뜻을 AR로 오버레이 해주는 언어 학습 애플리케이션입니다.'
+            },
+            'solar': {
+                // 무음(muted), 자동재생(autoplay), 무한반복(loop)을 걸어둬서 팝업이 뜨자마자 자연스럽게 재생되게 설정
+                media: '<video src="awd.mp4" autoplay loop muted playsinline></video>',
+                title: 'Smart Solar Tracker',
+                description: '광원(스마트폰 플래시 등)의 방향을 실시간으로 추적하여 패널이 자동으로 빛을 향해 움직이는 하드웨어 연동 iOS 프로젝트입니다.'
+            }
+        };
+
+        const modal = document.getElementById('projectModal');
+        const modalBody = document.getElementById('modalBody');
+
+        function openModal(projectId) {
+            const data = modalData[projectId];
+            
+            // 모달 안쪽 내용을 갈아끼우기
+            modalBody.innerHTML = `
+                ${data.media}
+                <div class="modal-desc">
+                    <h3>${data.title}</h3>
+                    <p>${data.description}</p>
+                </div>
+            `;
+            
+            // 모달 띄우기
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // 스크롤 원상복구
+            // 닫을 때 비디오 소리나 재생이 계속되는 걸 막기 위해 내용 비우기
+            setTimeout(() => {
+                modalBody.innerHTML = '';
+            }, 300);
+        }
+
+        // 모달창 바깥(반투명한 배경)을 클릭해도 꺼지게 만들기
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
