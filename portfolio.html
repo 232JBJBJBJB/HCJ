@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeong Been Lee - Portfolio</title>
+    <title>Portfolio</title>
     <style>
         /* 웹페이지 전체의 기본 폰트와 여백 설정 */
         * {
@@ -231,7 +231,8 @@
                     </tr>
                     <tr>
                         <td>g</td>
-                        <td><a href="https://github.com/232JBJBJB" target="_blank">https://github.com/232JBJBJB</a></td>
+                        <!-- 깃허브 주소 수정 완료 -->
+                        <td><a href="https://github.com/232JBJBJBJB" target="_blank">https://github.com/232JBJBJBJB</a></td>
                     </tr>
                 </table>
             </div>
@@ -243,7 +244,6 @@
         <section>
             <h2 class="section-title">Projects</h2>
             
-            <!-- LearnSpot 프로젝트 (클릭 이벤트 연결) -->
             <div class="list-item project-item" onclick="openModal('learnspot')">
                 <div class="date">2025-current</div>
                 <div class="details">
@@ -253,7 +253,6 @@
                 </div>
             </div>
 
-            <!-- Solar Tracker 프로젝트 (클릭 이벤트 연결) -->
             <div class="list-item project-item" onclick="openModal('solar')">
                 <div class="date">2026-2026</div>
                 <div class="details">
@@ -303,28 +302,24 @@
         <div class="page-num">1 &frasl; 1</div>
     </div>
 
-    <!-- =========================================
-         모달(팝업) HTML 구조
-         ========================================= -->
+    <!-- 모달(팝업) HTML 구조 -->
     <div id="projectModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <div id="modalBody" class="modal-body">
-                <!-- 자바스크립트를 통해 내용이 여기에 들어갑니다 -->
             </div>
         </div>
     </div>
 
     <script>
-        // 프로젝트별 모달에 들어갈 데이터 (사진, 동영상 및 텍스트)
+        // 프로젝트별 모달 데이터
         const modalData = {
             'learnspot': {
-                media: '<img src="IMG_6744.PNG" alt="LearnSpot Object Recognition UI">',
+                media: '<img src="IMG_6744.jpg" alt="LearnSpot Object Recognition UI">',
                 title: 'LearnSpot - AR & AI Language Learning',
                 description: '실시간 객체 인식 기술을 활용하여 사물의 이름과 병음, 뜻을 AR로 오버레이 해주는 언어 학습 애플리케이션입니다.'
             },
             'solar': {
-                // 무음(muted), 자동재생(autoplay), 무한반복(loop)을 걸어둬서 팝업이 뜨자마자 자연스럽게 재생되게 설정
                 media: '<video src="awd.mp4" autoplay loop muted playsinline></video>',
                 title: 'Smart Solar Tracker',
                 description: '광원(스마트폰 플래시 등)의 방향을 실시간으로 추적하여 패널이 자동으로 빛을 향해 움직이는 하드웨어 연동 iOS 프로젝트입니다.'
@@ -337,7 +332,6 @@
         function openModal(projectId) {
             const data = modalData[projectId];
             
-            // 모달 안쪽 내용을 갈아끼우기
             modalBody.innerHTML = `
                 ${data.media}
                 <div class="modal-desc">
@@ -346,21 +340,18 @@
                 </div>
             `;
             
-            // 모달 띄우기
             modal.classList.add('show');
-            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+            document.body.style.overflow = 'hidden'; 
         }
 
         function closeModal() {
             modal.classList.remove('show');
-            document.body.style.overflow = 'auto'; // 스크롤 원상복구
-            // 닫을 때 비디오 소리나 재생이 계속되는 걸 막기 위해 내용 비우기
+            document.body.style.overflow = 'auto'; 
             setTimeout(() => {
                 modalBody.innerHTML = '';
             }, 300);
         }
 
-        // 모달창 바깥(반투명한 배경)을 클릭해도 꺼지게 만들기
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModal();
