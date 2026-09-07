@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>釜山観光ガイド | Busan Tourism</title>
+    <meta name="description" content="釜山の魅力をお届けする公式観光ガイド。海雲台、広安里などの絶景スポットから絶品グルメまで、あなたの旅をサポートします。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#004D99',
+                        accent: '#FF5A5F',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                    },
+                    keyframes: {
+                        zoomOut: {
+                            '0%': { transform: 'scale(1.05)' },
+                            '100%': { transform: 'scale(1.15)' },
+                        },
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scrollLine: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    },
+                    animation: {
+                        zoomOut: 'zoomOut 20s infinite alternate',
+                        fadeUp: 'fadeUp 1s cubic-bezier(0.25, 0.8, 0.25, 1) forwards',
+                        scrollLine: 'scrollLine 2s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="font-sans text-gray-900 bg-white overflow-x-hidden antialiased">
+    <header id="navbar" data-scrolled="false"
+        class="group fixed top-0 left-0 w-full z-50 bg-white/5 backdrop-blur-md border-b border-white/10 transition-all duration-300 hover:bg-white/98 hover:shadow-sm data-[scrolled=true]:bg-white/98 data-[scrolled=true]:shadow-sm">
+        <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+            <a href="#"
+                class="flex flex-col text-white transition-colors duration-300 group-hover:text-gray-900 group-data-[scrolled=true]:text-gray-900">
+                <span
+                    class="font-sans text-xl font-black tracking-widest group-hover:text-primary group-data-[scrolled=true]:text-primary">BUSAN</span>
+                <span class="text-xs font-medium tracking-wider opacity-80">釜山観光</span>
+            </a>
+            <nav class="hidden md:block">
+                <ul
+                    class="flex gap-12 text-white font-semibold transition-colors duration-300 group-hover:text-gray-900 group-data-[scrolled=true]:text-gray-900">
+                    <li><a href="#destinations"
+                            class="relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-accent after:transition-all hover:after:w-full">どこへ行く？</a>
+                    </li>
+                    <li><a href="#activities"
+                            class="relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-accent after:transition-all hover:after:w-full">何をする？</a>
+                    </li>
+                    <li><a href="#food"
+                            class="relative py-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-accent after:transition-all hover:after:w-full">食べる</a>
+                    </li>
+                </ul>
+            </nav>
+            <div>
+                <button
+                    class="bg-accent text-white px-6 py-3 rounded-full font-semibold hover:-translate-y-0.5 hover:bg-[#E0484D] hover:shadow-[0_8px_20px_rgba(255,90,95,0.4)] transition-all">旅を計画する</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="relative h-screen min-h-[700px] flex items-center px-[5%] overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full -z-20">
+                <img src="https://images.unsplash.com/photo-1638591751482-1a7d27fcea15?q=80&w=2342&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="釜山 広安大橋の夜景"
+                    class="w-full h-full object-cover scale-105 animate-[zoomOut_20s_infinite_alternate]">
+            </div>
+            <!-- Gradient Overlay -->
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#001432]/85 to-[#001432]/20 -z-10">
+            </div>
+
+            <div class="text-white max-w-[600px] z-10 animate-fadeUp opacity-0 translate-y-8">
+                <h1
+                    class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight drop-shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+                    釜山、<br>新たな魅力を<br>発見する旅へ。</h1>
+                <p class="text-xl mb-10 font-medium opacity-90">海、文化、美食が交差するダイナミックな都市。</p>
+                <a href="#destinations"
+                    class="bg-accent text-white px-10 py-4 rounded-full text-lg font-semibold hover:-translate-y-0.5 hover:bg-[#E0484D] hover:shadow-[0_8px_20px_rgba(255,90,95,0.4)] transition-all inline-block">絶景を探す</a>
+            </div>
+
+            <div
+                class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-white text-xs font-semibold tracking-widest uppercase">
+                <span>Scroll</span>
+                <div class="w-0.5 h-10 bg-white/30 mt-2.5 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full bg-white animate-scrollLine"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="destinations" class="py-32">
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="mb-12">
+                    <h2 class="text-4xl font-extrabold mb-2 tracking-tight">どこへ行く？</h2>
+                    <p class="text-lg text-gray-600">釜山を代表する美しい名所を巡る。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Card 1 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[100%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1647767444107-8f383924382d?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="海雲台"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <span
+                                class="self-start px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-4">ビーチ・リゾート</span>
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                海雲台 (ヘウンデ)</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">韓国最大級の美しいビーチとモダンな高層ビル群が織りなす絶景。</p>
+                        </div>
+                    </a>
+                    <!-- Card 2 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[100%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1732517400836-3cb8f1be5204?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="広安里"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <span
+                                class="self-start px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-4">夜景・カフェ</span>
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                広安里 (クァンアンリ)</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">広安大橋のライトアップと、海沿いに並ぶおしゃれなカフェ通り。</p>
+                        </div>
+                    </a>
+                    <!-- Card 3 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[100%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1672671187899-a10f547341f1?q=80&w=2338&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="甘川文化村"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <span
+                                class="self-start px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-4">アート・文化</span>
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                甘川文化村 (カムチョン)</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">「釜山のマチュピチュ」と呼ばれる、カラフルでレトロな家々が並ぶアートな村。</p>
+                        </div>
+                    </a>
+                    <!-- Card 4 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[100%] overflow-hidden">
+                            <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FZJzw1%2FbtsKGOUtjvf%2FAAAAAAAAAAAAAAAAAAAAABnyUMsRJ_xFw2sfFloRT9WxPA0cuhgQxc766NZhFN-_%2Fimg.jpg%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1790780399%26allow_ip%3D%26allow_referer%3D%26signature%3Dwl3eKgWeNqTDiCzVmwiHxVctLI8%253D"
+                                alt="太宗台"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <span
+                                class="self-start px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-4">自然・絶景</span>
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                太宗台 (テジョンデ)</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">青い海と切り立った奇岩が創り出す、息を呑むような大自然のパノラマ。</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="activities" class="py-32 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="mb-12">
+                    <h2 class="text-4xl font-extrabold mb-2 tracking-tight">何をする？</h2>
+                    <p class="text-lg text-gray-600">釜山ならではの特別な体験と思い出作り。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Activity 1 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[70%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1503803548695-c2a7b4a5b875?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="ヨットツアー"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                サンセット・ヨットツアー</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">船上から眺める広安大橋の美しい夕焼けとロマンチックな夜景。</p>
+                        </div>
+                    </a>
+                    <!-- Activity 2 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[70%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1747064585919-c667628abd6e?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="スカイカプセル"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                海雲台ブルーラインパーク</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">海沿いを走るカラフルなスカイカプセルで、絶景の空中散歩。</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="food" class="py-32">
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="mb-12">
+                    <h2 class="text-4xl font-extrabold mb-2 tracking-tight">食べる</h2>
+                    <p class="text-lg text-gray-600">港町ならではの新鮮な海の幸と、心温まるローカルフード。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Food 1 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[60%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1673520859629-ae3f781cf034?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="テジクッパ"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                テジクッパ (豚肉スープご飯)</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                じっくり煮込んだ豚骨スープが胃に優しい、釜山のソウルフード。濃厚でありながらあっさりとした味わいが特徴です。</p>
+                        </div>
+                    </a>
+                    <!-- Food 2 -->
+                    <a href="#"
+                        class="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.1)] border border-black/5 hover:-translate-y-2 hover:shadow-[0_20px_48px_rgba(0,0,0,0.15)] transition-all duration-300">
+                        <div class="relative w-full pt-[60%] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1698462297918-79ae9314e062?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="海鮮料理"
+                                class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3
+                                class="text-2xl font-bold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                                新鮮な海鮮料理・お刺身</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                チャガルチ市場や海雲台で味わう、獲れたての魚介類。ピリ辛の海鮮鍋や、豪快な貝焼きも必食です。</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-950 text-white pt-20 pb-8">
+        <div class="max-w-7xl mx-auto px-8">
+            <div
+                class="flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-12 mb-8 text-center md:text-left gap-8">
+                <div>
+                    <h2 class="font-sans text-2xl font-black tracking-widest">BUSAN TOURISM</h2>
+                    <p class="text-white/60 text-sm mt-2">釜山観光公式ガイド</p>
+                </div>
+                <div>
+                    <ul class="flex flex-col md:flex-row gap-8">
+                        <li><a href="#" class="text-white/60 hover:text-white transition-colors">プライバシーポリシー</a></li>
+                        <li><a href="#" class="text-white/60 hover:text-white transition-colors">利用規約</a></li>
+                        <li><a href="#" class="text-white/60 hover:text-white transition-colors">お問い合わせ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center text-white/40 text-sm">
+                <p>&copy; 2024 Busan Tourism. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.setAttribute('data-scrolled', 'true');
+            } else {
+                navbar.setAttribute('data-scrolled', 'false');
+            }
+        });
+    </script>
+</body>
+
+</html>
