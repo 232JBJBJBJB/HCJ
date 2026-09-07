@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <title>설문조사</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
+        background-color: #f5f6f8;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+        display: flex;
+        justify-content: center;
+      }
+      #app-container {
+        background-color: #ffffff;
+        padding: 36px 32px;
+        width: 100%;
+        max-width: 460px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .header-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e1e1e;
+        margin-bottom: 8px;
+        text-align: left;
+      }
+      .header-desc {
+        font-size: 13px;
+        color: #8e8e93;
+        margin-bottom: 28px;
+        line-height: 1.4;
+      }
+      .form-group {
+        margin-bottom: 22px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c2c2e;
+      }
+      input[type="text"], select, textarea {
+        width: 100%;
+        padding: 12px 14px;
+        box-sizing: border-box;
+        border: 1px solid #e5e5ea;
+        border-radius: 8px;
+        font-size: 14px;
+        background-color: #fafafa;
+        transition: all 0.2s ease;
+        outline: none;
+        font-family: inherit;
+      }
+      input[type="text"]:focus, select:focus, textarea:focus {
+        border-color: #03c75a; /* 네이버 시그니처 그린 */
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(3, 199, 90, 0.12);
+      }
+      textarea {
+        resize: vertical;
+      }
+      button {
+        width: 100%;
+        padding: 14px;
+        background-color: #03c75a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 700;
+        margin-top: 10px;
+        transition: background-color 0.2s;
+      }
+      button:hover {
+        background-color: #02b351;
+      }
+      #success-message {
+        display: none;
+        text-align: center;
+        background-color: #ffffff;
+        color: #1e1e1e;
+        padding: 40px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="app-container">
+      <div class="header-title">교육 만족도 설문조사</div>
+      <div class="header-desc">더 나은 교육 제공을 위해 의견을 남겨주세요.</div>
+      
+      <form id="surveyForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label for="name">참석자 이름</label>
+          <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="satisfaction">오늘 교육 만족도</label>
+          <select id="satisfaction" name="satisfaction" required>
+            <option value="" disabled selected>선택해주세요</option>
+            <option value="매우 만족">매우 만족</option>
+            <option value="만족">만족</option>
+            <option value="보통">보통</option>
+            <option value="불만족">불만족</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="feedback">개선 의견이나 건의사항</label>
+          <textarea id="feedback" name="feedback" rows="4" placeholder="자유롭게 작성해 주세요" required></textarea>
+        </div>
+        
+        <button type="submit" id="submitBtn">제출하기</button>
+      </form>
+    </div>
+
+    <div id="success-message">
+      🎉<br><br>설문에 응해주셔서 감사합니다!<br>제출이 성공적으로 완료되었습니다.
+    </div>
+
+    <script>
+      function handleFormSubmit(event) {
+        event.preventDefault(); 
+        var submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "제출 중...";
+
+        var formData = {
+          name: document.getElementById('name').value,
+          satisfaction: document.getElementById('satisfaction').value,
+          feedback: document.getElementById('feedback').value
+        };
+
+        google.script.run
+          .withSuccessHandler(function(success) {
+            if(success) {
+              document.getElementById('app-container').style.display = 'none';
+              document.getElementById('success-message').style.display = 'block';
+            } else {
+              alert('오류가 발생했습니다. 다시 시도해 주세요.');
+              submitBtn.disabled = false;
+              submitBtn.innerText = "제출하기";
+            }
+          })
+          .submitData(formData);
+      }
+    </script>
+  </body>
+</html>
