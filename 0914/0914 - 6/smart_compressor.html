@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Doc Compressor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+
+        /* 1. 기기 설정(System)에 무조건 따르는 테마 설정 */
+        :root {
+            /* 기본(라이트 모드) - 짙은 파란색 베이스 */
+            --bg-base: #60a5fa;
+            --bg-glow: #1d4ed8;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --box-bg: rgba(255, 255, 255, 0.85);
+            --border-color: #93c5fd;
+            --dropzone-bg: rgba(255, 255, 255, 0.5);
+            --btn-bg: #1e3a8a;
+            --btn-text: #ffffff;
+            --x: 50%;
+            --y: 50%;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            /* 다크 모드 - 심연의 네이비 블루 */
+            :root {
+                --bg-base: #0f172a;
+                --bg-glow: #1e3a8a;
+                --text-color: #f8fafc;
+                --text-muted: #94a3b8;
+                --box-bg: rgba(30, 41, 59, 0.85);
+                --border-color: #334155;
+                --dropzone-bg: rgba(15, 23, 42, 0.5);
+                --btn-bg: #3b82f6;
+                --btn-text: #ffffff;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Gowun Dodum', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            /* 3. 짙은 파란색 그라데이션 */
+            background: radial-gradient(circle at var(--x) var(--y), var(--bg-glow) 0%, var(--bg-base) 70%);
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .header-left img {
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .header-right {
+            font-weight: bold;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .title-area {
+            text-align: center;
+            margin-bottom: 40px;
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+        }
+
+        .title-area h2 {
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+            color: var(--btn-bg);
+        }
+
+        .title-area p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        /* 드롭존 영역 & 애니메이션 */
+        .dropzone {
+            width: 100%;
+            padding: 50px 20px;
+            border: 3px dashed var(--border-color);
+            border-radius: 15px;
+            background: var(--dropzone-bg);
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropzone:hover {
+            border-color: var(--btn-bg);
+            background: var(--box-bg);
+        }
+
+        /* 3. 드롭존 반짝임 애니메이션 */
+        .dropzone.dragover {
+            border-color: var(--btn-bg);
+            background: var(--box-bg);
+            animation: pulseGlow 1.5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .dropzone input[type="file"] {
+            display: none;
+        }
+
+        .dropzone-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--btn-bg);
+        }
+
+        .dropzone h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .dropzone p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .btn-select {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            pointer-events: none; /* 클릭은 부모 dropzone이 처리 */
+        }
+
+        /* 파일 목록 영역 */
+        .queue-area {
+            width: 100%;
+            margin-top: 40px;
+            display: none; /* 파일이 있을 때만 보임 */
+        }
+
+        .queue-area h3 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            background: var(--box-bg);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* 3. 확장자별 컬러 아이콘 */
+        .file-icon {
+            font-size: 2rem;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .icon-pdf { color: #ef4444; } /* 빨강 */
+        .icon-doc { color: #3b82f6; } /* 파랑 */
+        .icon-ppt { color: #f97316; } /* 주황 */
+        .icon-img { color: #10b981; } /* 초록 */
+        .icon-default { color: #64748b; }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .file-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--btn-bg);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .download-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none; /* 완료 시 표시 */
+            text-decoration: none;
+        }
+        .download-btn:hover { background: #059669; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="header-left">
+            <img src="logo.png" alt="로고" onerror="this.src='https://via.placeholder.com/120x40/1e3a8a/ffffff?text=LOGO'">
+            <h1>Smart Doc</h1>
+        </a>
+        <div class="header-right">
+            Smart Doc Compressor
+        </div>
+    </header>
+
+    <main>
+        <div class="title-area">
+            <h2>Secure & Smart Compression</h2>
+            <p>All files are processed in your browser, and no data is ever leaked externally.</p>
+        </div>
+
+        <!-- 드래그 앤 드롭 영역 -->
+        <div class="dropzone" id="dropzone">
+            <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.hwp">
+            <div class="dropzone-icon">☁️</div>
+            <h3>Upload or Drop your file!</h3>
+            <p>Support PDF, PPT, DOC, Images (JPG, PNG)</p>
+            <button class="btn-select">Select Files</button>
+        </div>
+
+        <!-- 처리 목록 영역 -->
+        <div class="queue-area" id="queue-area">
+            <h3>Processing Queue</h3>
+            <div id="file-list"></div>
+        </div>
+    </main>
+
+    <script>
+        // 마우스 그라데이션 인터랙션
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.documentElement.style.setProperty('--x', `${x}%`);
+            document.documentElement.style.setProperty('--y', `${y}%`);
+        });
+
+        // DOM 요소
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const queueArea = document.getElementById('queue-area');
+        const fileList = document.getElementById('file-list');
+
+        // 클릭 시 파일 선택창 열기
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // 드래그 앤 드롭 애니메이션 (dragover 클래스 토글)
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFiles(e.target.files);
+            }
+            // 같은 파일 다시 선택할 수 있도록 초기화
+            fileInput.value = '';
+        });
+
+        // 파일 처리 메인 로직
+        function handleFiles(files) {
+            queueArea.style.display = 'block';
+
+            Array.from(files).forEach(file => {
+                const fileName = file.name;
+                const ext = fileName.split('.').pop().toLowerCase();
+                const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+
+                // 2. 복잡한 규격 파일 예외 처리 및 알림
+                if (ext === 'hwp') {
+                    alert(`[압축 불가] ${fileName}
+HWP 파일은 지원하지 않습니다. PDF나 Word로 변환해서 다시 올려주세요.`);
+                    return; // 업로드 중단
+                }
+
+                let warningMsg = '';
+                if (ext === 'pdf') {
+                    warningMsg = `<div style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;">⚠️ PDF 파일이 업로드되어 저화질 스캔본 형태로 우회 압축을 진행합니다.</div>`;
+                    alert(`[우회 압축 진행] ${fileName}
+PDF 파일은 규격이 복잡하여 모든 페이지를 캡처한 뒤 저화질 스캔본 형태로 압축합니다.`);
+                }
+
+                // UI 생성
+                const fileId = 'file-' + Math.random().toString(36).substr(2, 9);
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.id = fileId;
+
+                // 아이콘 색상 결정
+                let iconClass = 'icon-default';
+                let iconSymbol = '📄';
+                if (ext.includes('pdf')) { iconClass = 'icon-pdf'; iconSymbol = '📕'; }
+                else if (ext.includes('doc')) { iconClass = 'icon-doc'; iconSymbol = '📘'; }
+                else if (ext.includes('ppt')) { iconClass = 'icon-ppt'; iconSymbol = '📙'; }
+                else if (['jpg','jpeg','png'].includes(ext)) { iconClass = 'icon-img'; iconSymbol = '🖼️'; }
+
+                fileItem.innerHTML = `
+                    <div class="file-icon ${iconClass}">${iconSymbol}</div>
+                    <div class="file-info">
+                        <div class="file-name">${fileName}</div>
+                        <div class="file-meta">용량: ${fileSize} <span id="status-${fileId}">| 압축 준비 중...</span></div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-${fileId}"></div>
+                        </div>
+                        ${warningMsg}
+                    </div>
+                    <a href="#" class="download-btn" id="btn-${fileId}">다운로드 ⬇</a>
+                `;
+                fileList.prepend(fileItem); // 최신 항목을 위로
+
+                // 가상의 압축 진행 시뮬레이션
+                simulateCompression(fileId, fileName, ext);
+            });
+        }
+
+        function simulateCompression(fileId, originalName, ext) {
+            const progressBar = document.getElementById(`progress-${fileId}`);
+            const statusText = document.getElementById(`status-${fileId}`);
+            const downloadBtn = document.getElementById(`btn-${fileId}`);
+            
+            let progress = 0;
+            // PDF는 우회 처리라 시간이 조금 더 걸리는 연출
+            const speed = ext === 'pdf' ? 150 : 80; 
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 15) + 5;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    statusText.innerText = '| 압축 완료!';
+                    statusText.style.color = '#10b981';
+                    
+                    // 완료 후 다운로드 버튼 활성화 (가상 다운로드)
+                    downloadBtn.style.display = 'block';
+                    downloadBtn.onclick = (e) => {
+                        e.preventDefault();
+                        alert(`compressed_${originalName} 파일이 다운로드되었습니다.`);
+                    };
+                }
+                progressBar.style.width = progress + '%';
+            }, speed);
+        }
+    </script>
+</body>
+</html>

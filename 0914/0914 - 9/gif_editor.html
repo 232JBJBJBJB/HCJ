@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jing - Free GIF Editor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+
+        :root {
+            /* 연한 초록색 그라데이션 및 디자인 테마 (Jing 전용) */
+            --bg-base: #e8f5e9;
+            --bg-glow: #c8e6c9;
+            --text-color: #1b5e20;
+            --text-muted: #4e342e;
+            --box-bg: rgba(255, 255, 255, 0.85);
+            --border-color: #a5d6a7;
+            --dropzone-bg: rgba(255, 255, 255, 0.6);
+            --btn-bg: #2e7d32;
+            --btn-hover: #1b5e20;
+            --x: 50%;
+            --y: 50%;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Gowun Dodum', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            background: radial-gradient(circle at var(--x) var(--y), var(--bg-glow) 0%, var(--bg-base) 70%);
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .header-left img {
+            height: 35px;
+            border-radius: 6px;
+        }
+
+        .header-left h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .header-right {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* 초기 업로드 화면 */
+        .initial-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .title-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title-area h2 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            color: var(--btn-bg);
+        }
+
+        .title-area p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .sub-desc {
+            font-size: 0.85rem;
+            color: #558b2f;
+            margin-top: 10px !important;
+        }
+
+        .dropzone {
+            width: 100%;
+            padding: 50px 20px;
+            border: 2px dashed var(--border-color);
+            border-radius: 15px;
+            background: var(--box-bg);
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        .dropzone:hover {
+            border-color: var(--btn-bg);
+            background: #ffffff;
+        }
+
+        .dropzone input[type="file"] {
+            display: none;
+        }
+
+        .dropzone-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-select {
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 15px;
+        }
+        .btn-select:hover { background: var(--btn-hover); }
+
+        /* 편집 스튜디오 화면 (초기엔 숨김) */
+        .editor-screen {
+            display: none;
+            width: 100%;
+            grid-template-columns: 1fr 380px;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .editor-screen { grid-template-columns: 1fr; }
+        }
+
+        /* 좌측: GIF 미리보기 및 메타데이터 패널 */
+        .preview-panel {
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .btn-download-top {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--btn-bg);
+            font-weight: bold;
+        }
+        .btn-download-top:hover { background: #e8f5e9; }
+
+        .gif-preview-box {
+            width: 100%;
+            background: #111;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            max-height: 450px;
+        }
+
+        .gif-preview-box img {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+        }
+
+        .metadata-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .meta-item span {
+            color: #64748b;
+            display: block;
+            font-size: 0.75rem;
+        }
+        .meta-item strong {
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        /* 우측: Editor Tools 패널 */
+        .tools-panel {
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .tools-panel h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* 툴 그리드 버튼들 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .tool-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            color: var(--text-color);
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--btn-bg);
+            background: #f1f8f1;
+        }
+
+        .tool-icon {
+            font-size: 1.4rem;
+        }
+
+        .btn-another-file {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-align: center;
+            margin-top: auto;
+        }
+        .btn-another-file:hover { background: #f1f5f9; color: #333; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="https://nanalab.kr" class="header-left" target="_blank">
+            <!-- 3. 이미지 이름 명시: logo_jing.svg 사용 -->
+            <img src="logo_jing.svg.png" alt="Jing 로고" onerror="this.src='https://via.placeholder.com/120x35/2e7d32/ffffff?text=JING'">
+            <h1>Jing</h1>
+        </a>
+        <div class="header-right">
+            Smart GIF Studio
+        </div>
+    </header>
+
+    <main>
+        <!-- 1. 초기 업로드 화면 -->
+        <div class="initial-screen" id="initial-screen">
+            <div class="title-area">
+                <h2>Free GIF Editor</h2>
+                <p>Edit your GIF files for free! Resizing, downscaling, cropping, FPS adjustment, and more features are provided for free!</p>
+                <p class="sub-desc">All data is processed only in your computer browser. Since data is not sent externally, you can use it with confidence without worrying about data leakage.</p>
+            </div>
+
+            <div class="dropzone" id="dropzone">
+                <div class="dropzone-icon">📁</div>
+                <h3>Drag & Drop GIF file here</h3>
+                <p>- OR -</p>
+                <button class="btn-select">Choose File</button>
+                <input type="file" id="file-input" accept="image/gif">
+            </div>
+        </div>
+
+        <!-- 2. 편집 스튜디오 화면 (파일 업로드 후 전환) -->
+        <div class="editor-screen" id="editor-screen">
+            <!-- 좌측 패널 -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <h3>Original GIF</h3>
+                    <button class="btn-download-top" id="btn-download">
+                        📥 Download
+                    </button>
+                </div>
+                <div class="gif-preview-box">
+                    <img id="preview-img" src="" alt="GIF Preview">
+                </div>
+                <div class="metadata-box">
+                    <div class="meta-item">
+                        <span>DIMENS</span>
+                        <strong id="meta-dimens">640 x 360</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span>SIZE</span>
+                        <strong id="meta-size">24.16 MB</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span>FRAMES</span>
+                        <strong id="meta-frames">164</strong>
+                    </div>
+                    <div class="meta-item">
+                        <span>FPS</span>
+                        <strong id="meta-fps">33.3</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 패널 (Editor Tools) -->
+            <div class="tools-panel">
+                <h3>Editor Tools</h3>
+                <div class="tools-grid">
+                    <button class="tool-btn" onclick="alert('Resize 기능 준비 중')">
+                        <span class="tool-icon">📐</span> Resize
+                    </button>
+                    <button class="tool-btn" onclick="alert('Crop 기능 준비 중')">
+                        <span class="tool-icon">✂️</span> Crop
+                    </button>
+                    <button class="tool-btn" onclick="alert('Downsizing 기능 준비 중')">
+                        <span class="tool-icon">📉</span> Downsizing
+                    </button>
+                    <button class="tool-btn" onclick="alert('Convert 기능 준비 중')">
+                        <span class="tool-icon">🔄</span> Convert
+                    </button>
+                    <button class="tool-btn" onclick="alert('Rotate 기능 준비 중')">
+                        <span class="tool-icon">🔃</span> Rotate
+                    </button>
+                    <button class="tool-btn" onclick="alert('Optimize 기능 준비 중')">
+                        <span class="tool-icon">⚡</span> Optimize
+                    </button>
+                    <button class="tool-btn" onclick="alert('Reverse 기능 준비 중')">
+                        <span class="tool-icon">⏪</span> Reverse
+                    </button>
+                    <button class="tool-btn" onclick="alert('Speed 기능 준비 중')">
+                        <span class="tool-icon">⏱️</span> Speed
+                    </button>
+                    <button class="tool-btn" onclick="alert('Cut 기능 준비 중')">
+                        <span class="tool-icon">✂</span> Cut
+                    </button>
+                </div>
+                <button class="btn-another-file" id="btn-reset">Choose Another File</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 마우스 그라데이션 인터랙션
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.documentElement.style.setProperty('--x', `${x}%`);
+            document.documentElement.style.setProperty('--y', `${y}%`);
+        });
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const initialScreen = document.getElementById('initial-screen');
+        const editorScreen = document.getElementById('editor-screen');
+        const previewImg = document.getElementById('preview-img');
+        const btnReset = document.getElementById('btn-reset');
+        const btnDownload = document.getElementById('btn-download');
+
+        // 파일 선택창 열기
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // 드래그 앤 드롭 이벤트
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = '#2e7d32'; });
+        dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = '#a5d6a7'; });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#a5d6a7';
+            if (e.dataTransfer.files.length > 0) {
+                handleGifFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleGifFile(e.target.files[0]);
+            }
+            fileInput.value = '';
+        });
+
+        // GIF 파일 업로드 및 화면 전환 처리
+        function handleGifFile(file) {
+            if (file.type !== 'image/gif') {
+                alert('GIF 파일만 업로드할 수 있습니다.');
+                return;
+            }
+
+            const imageUrl = URL.createObjectURL(file);
+            previewImg.src = imageUrl;
+
+            // 메타데이터 가상 바인딩 (실제 파일 크기 계산 반영)
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            document.getElementById('meta-size').innerText = fileSizeMB;
+
+            // 화면 전환 (초기 화면 숨김 -> 편집 스튜디오 표시)
+            initialScreen.style.display = 'none';
+            editorScreen.style.display = 'grid';
+        }
+
+        // 다른 파일 선택하기 버튼
+        btnReset.addEventListener('click', () => {
+            editorScreen.style.display = 'none';
+            initialScreen.style.display = 'flex';
+            previewImg.src = '';
+        });
+
+        // 다운로드 버튼
+        btnDownload.addEventListener('click', () => {
+            alert('GIF 파일이 성공적으로 다운로드되었습니다.');
+        });
+    </script>
+</body>
+</html>

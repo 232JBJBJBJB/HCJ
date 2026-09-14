@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart QR</title>
+    <!-- QR 생성 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+
+        :root {
+            /* 라이트 테마: 연한 하늘색 */
+            --bg-base: #eef7fa;
+            --bg-glow: #d0e8f2;
+            --text-color: #2c3e50;
+            --box-bg: rgba(255, 255, 255, 0.7);
+            --input-border: #7da4c4;
+            --btn-bg: #7da4c4;
+            --btn-hover: #5b87a8;
+            --x: 50%;
+            --y: 50%;
+        }
+
+        [data-theme="dark"] {
+            /* 다크 테마: 짙은 네이비/블루 */
+            --bg-base: #1a202c;
+            --bg-glow: #2c4159;
+            --text-color: #e2e8f0;
+            --box-bg: rgba(30, 41, 59, 0.8);
+            --input-border: #475569;
+            --btn-bg: #475569;
+            --btn-hover: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Gowun Dodum', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            /* 마우스 위치에 따라 바뀌는 그라데이션 배경 */
+            background: radial-gradient(circle at var(--x) var(--y), var(--bg-glow) 0%, var(--bg-base) 60%);
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-left img {
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .header-right select {
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--input-border);
+            background: var(--box-bg);
+            color: var(--text-color);
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .title-area h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .title-area p {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .interaction-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* QR 코드 출력 영역 */
+        #qr-wrapper {
+            display: none; /* 초기에는 숨김 */
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #qr-wrapper:hover {
+            transform: scale(1.02);
+        }
+
+        .qr-hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 0;
+        }
+
+        /* 입력창 영역 */
+        .input-group {
+            display: flex;
+            width: 100%;
+            background: var(--box-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 30px;
+            padding: 5px;
+            backdrop-filter: blur(5px);
+        }
+
+        .input-group input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 15px 20px;
+            font-size: 1rem;
+            color: var(--text-color);
+            outline: none;
+            font-family: inherit;
+        }
+
+        .input-group button {
+            background: var(--btn-bg);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            padding: 0 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .input-group button:hover {
+            background: var(--btn-hover);
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 15px 20px; }
+            .title-area h2 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="logo.png" alt="로고" onerror="this.src='https://via.placeholder.com/120x40/7da4c4/ffffff?text=LOGO'">
+            <h1>Smart QR</h1>
+        </div>
+        <div class="header-right">
+            <!-- 화이트/다크/기기 설정 선택 탭 -->
+            <select id="theme-select">
+                <option value="system">기기 설정</option>
+                <option value="light">화이트 모드</option>
+                <option value="dark">다크 모드</option>
+            </select>
+        </div>
+    </header>
+
+    <main>
+        <div class="title-area">
+            <h2>Simply Generate QR Codes</h2>
+            <p>Enter your URL below to create a custom QR code instantly.</p>
+        </div>
+
+        <div class="interaction-area">
+            <!-- 생성된 QR 코드가 나타날 곳 -->
+            <div id="qr-wrapper">
+                <div id="qrcode"></div>
+                <p class="qr-hint">클릭하여 JPG로 다운로드</p>
+            </div>
+
+            <!-- URL 입력창 (초기엔 중앙, QR 생성 후 아래로 밀림) -->
+            <div class="input-group">
+                <input type="text" id="url-input" placeholder="https://example.com" autocomplete="off" />
+                <button id="generate-btn">생성</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* 1. 마우스 위치에 따른 배경 그라데이션 인터랙션 */
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.documentElement.style.setProperty('--x', `${x}%`);
+            document.documentElement.style.setProperty('--y', `${y}%`);
+        });
+
+        /* 2. 테마 설정 (화이트/다크/기기) */
+        const themeSelect = document.getElementById('theme-select');
+        
+        function applyTheme(theme) {
+            if (theme === 'system') {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            localStorage.setItem('qr-theme', theme);
+        }
+
+        // 초기 테마 로딩
+        const savedTheme = localStorage.getItem('qr-theme') || 'system';
+        themeSelect.value = savedTheme;
+        applyTheme(savedTheme);
+
+        // 셀렉트 박스 변경 이벤트
+        themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
+
+        // 기기 설정(OS)이 바뀔 때 실시간 감지
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (themeSelect.value === 'system') {
+                applyTheme('system');
+            }
+        });
+
+        /* 3. QR 코드 생성 및 배치 변경 */
+        const generateBtn = document.getElementById('generate-btn');
+        const urlInput = document.getElementById('url-input');
+        const qrWrapper = document.getElementById('qr-wrapper');
+        const qrcodeDiv = document.getElementById('qrcode');
+        let qrObj = null;
+
+        generateBtn.addEventListener('click', () => {
+            const url = urlInput.value.trim();
+            if (!url) {
+                alert("URL을 입력해주세요!");
+                return;
+            }
+
+            // 기존 QR 삭제
+            qrcodeDiv.innerHTML = "";
+            
+            // 새 QR 생성 (qrcode.js 라이브러리 사용)
+            qrObj = new QRCode(qrcodeDiv, {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // 숨겨져 있던 QR 영역 표시 (이때 입력창은 자연스럽게 아래로 밀림)
+            qrWrapper.style.display = 'block';
+        });
+
+        // 엔터키 지원
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') generateBtn.click();
+        });
+
+        /* 4. QR 코드 클릭 시 JPG 다운로드 */
+        qrWrapper.addEventListener('click', () => {
+            // qrcode.js가 생성한 canvas 요소를 찾음
+            const canvas = qrcodeDiv.querySelector('canvas');
+            if (canvas) {
+                // canvas 이미지를 data URL(JPG) 형태로 변환
+                const imgData = canvas.toDataURL("image/jpeg");
+                
+                // 임시 a 태그를 만들어 다운로드 트리거
+                const a = document.createElement('a');
+                a.href = imgData;
+                a.download = "smart-qr.jpg";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        });
+    </script>
+</body>
+</html>

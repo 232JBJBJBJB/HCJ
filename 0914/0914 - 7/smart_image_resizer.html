@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nap - Smart Image Resizer</title>
+    <!-- ZIP 생성 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary-color: #0f172a; /* 빈빈컴퍼니 시그니처 블랙/다크네이비 */
+            --primary-hover: #334155;
+            --accent-color: #3b82f6; /* 선택된 버튼 등 강조 컬러 */
+            --box-bg: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 헤더 영역 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: var(--box-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .header-left img {
+            height: 35px;
+            border-radius: 6px;
+        }
+
+        .header-left h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .header-right {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        /* 메인 컨텐츠 영역 */
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .title-area {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title-area h2 {
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .title-area p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* 좌우 레이아웃 분할 */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .workspace { grid-template-columns: 1fr; }
+        }
+
+        /* 좌측: 드롭존 */
+        .dropzone-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dropzone {
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary-color);
+            background: #f1f5f9;
+        }
+
+        .dropzone input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+        .drop-text {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .btn-select {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        /* 우측: 설정 패널 */
+        .settings-panel {
+            padding-left: 20px;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .option-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .color-picker input[type="color"] {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .color-picker span { color: var(--text-muted); font-size: 0.85rem;}
+
+        /* 작업 목록 및 프로그레스 */
+        .queue-container {
+            margin-top: 40px;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: none; /* 숨김 */
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .queue-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .btn-batch-download {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            display: none;
+        }
+
+        .btn-batch-download:hover { background: #059669; }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .file-thumb {
+            width: 50px;
+            height: 50px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .file-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        .btn-download-single {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 35px;
+            height: 35px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .btn-download-single.ready {
+            pointer-events: auto;
+            opacity: 1;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-download-single.ready:hover { background: #f1f5f9; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <!-- 빈빈컴퍼니 로고 이미지 적용 (없으면 임시 텍스트) -->
+        <a href="https://nanalab.kr" class="header-left" target="_blank">
+            <img src="logo_binbin.svg.png" alt="빈빈컴퍼니 로고" onerror="this.src='https://via.placeholder.com/120x35/0f172a/ffffff?text=BINBIN'">
+            <h1>Nap</h1>
+        </a>
+        <div class="header-right">
+            Smart Image Resizer
+        </div>
+    </header>
+
+    <main>
+        <div class="title-area">
+            <h2>Secure & Smart Image Resizing</h2>
+            <p>All files are processed in your browser, and no data is ever leaked externally.</p>
+        </div>
+
+        <div class="workspace">
+            <!-- 좌측: 파일 업로드 -->
+            <div class="dropzone-container">
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="file-input" multiple accept="image/*">
+                    <div class="upload-icon">↑_</div>
+                    <div class="drop-text">Drag & Drop your files or</div>
+                    <button class="btn-select">Select Files</button>
+                </div>
+            </div>
+
+            <!-- 우측: 옵션 설정 -->
+            <div class="settings-panel">
+                <div class="setting-group">
+                    <div class="setting-title">Image Size (Long Axis)</div>
+                    <div class="btn-group" id="size-options">
+                        <button class="option-btn active">Origin</button>
+                        <button class="option-btn">400</button>
+                        <button class="option-btn">800</button>
+                        <button class="option-btn">1200</button>
+                        <button class="option-btn">1600</button>
+                        <button class="option-btn">Custom</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-title">Aspect Ratio</div>
+                    <div class="btn-group" id="ratio-options">
+                        <button class="option-btn active">1:1</button>
+                        <button class="option-btn">3:4</button>
+                        <button class="option-btn">4:3</button>
+                        <button class="option-btn">9:16</button>
+                        <button class="option-btn">16:9</button>
+                        <button class="option-btn">Custom</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-title">Resize Mode</div>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="resize-mode" value="padding" checked> ◉ Padding (여백)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="resize-mode" value="crop"> ○ Crop (자르기)
+                        </label>
+                    </div>
+                    
+                    <div class="setting-title" style="margin-top: 15px;">Background Color</div>
+                    <div class="color-picker">
+                        <input type="color" value="#ffffff" id="bg-color-picker">
+                        <span id="color-hex">#FFFFFF</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단: 작업 큐 -->
+        <div class="queue-container" id="queue-container">
+            <div class="queue-header">
+                <h3>작업 목록</h3>
+                <button class="btn-batch-download" id="btn-batch">일괄 다운로드 (ZIP)</button>
+            </div>
+            <div class="file-list" id="file-list">
+                <!-- 파일 아이템 생성될 위치 -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 옵션 버튼 활성화 토글 로직
+        function setupButtonGroup(groupId) {
+            const group = document.getElementById(groupId);
+            const buttons = group.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        }
+        setupButtonGroup('size-options');
+        setupButtonGroup('ratio-options');
+
+        // 컬러 피커 헥스코드 업데이트
+        const colorPicker = document.getElementById('bg-color-picker');
+        const colorHex = document.getElementById('color-hex');
+        colorPicker.addEventListener('input', (e) => {
+            colorHex.textContent = e.target.value.toUpperCase();
+        });
+
+        // 드래그 앤 드롭 및 파일 선택 로직
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const queueContainer = document.getElementById('queue-container');
+        const fileList = document.getElementById('file-list');
+        const btnBatch = document.getElementById('btn-batch');
+
+        let totalFiles = 0;
+        let completedFiles = 0;
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) processFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) processFiles(e.target.files);
+            fileInput.value = ''; // 리셋
+        });
+
+        // 파일 처리 시뮬레이션
+        function processFiles(files) {
+            queueContainer.style.display = 'block';
+            btnBatch.style.display = 'none';
+            totalFiles += files.length;
+
+            Array.from(files).forEach(file => {
+                const fileId = 'img-' + Math.random().toString(36).substr(2, 9);
+                
+                // 임시 썸네일 URL 생성
+                const thumbUrl = URL.createObjectURL(file);
+
+                const itemHtml = `
+                    <div class="file-item" id="${fileId}">
+                        <img src="${thumbUrl}" class="file-thumb" alt="thumb">
+                        <div class="file-info">
+                            <div class="file-name">${file.name}</div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="prog-${fileId}"></div>
+                            </div>
+                        </div>
+                        <button class="btn-download-single" id="down-${fileId}" title="다운로드">📥</button>
+                    </div>
+                `;
+                fileList.insertAdjacentHTML('beforeend', itemHtml);
+
+                simulateImageProcessing(fileId, file.name);
+            });
+        }
+
+        function simulateImageProcessing(fileId, fileName) {
+            const progBar = document.getElementById(`prog-${fileId}`);
+            const downBtn = document.getElementById(`down-${fileId}`);
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 완료 처리
+                    downBtn.classList.add('ready');
+                    downBtn.onclick = () => alert(`${fileName} 다운로드 완료 (시뮬레이션)`);
+                    
+                    completedFiles++;
+                    checkAllCompleted();
+                }
+                progBar.style.width = progress + '%';
+            }, 150);
+        }
+
+        function checkAllCompleted() {
+            if (completedFiles === totalFiles && totalFiles > 0) {
+                btnBatch.style.display = 'block';
+                btnBatch.onclick = () => alert('압축 파일(ZIP) 다운로드가 시작됩니다.');
+            }
+        }
+    </script>
+</body>
+</html>

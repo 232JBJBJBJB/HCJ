@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>모바일 청첩장</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #eef7fa; /* 연한 하늘색 배경 */
+            font-family: 'Gowun Dodum', sans-serif;
+            color: #333;
+        }
+        .mobile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            overflow-x: hidden;
+        }
+        section {
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px dashed #cce3f0;
+        }
+        section:last-child {
+            border-bottom: none;
+        }
+        
+        /* 헤더 영역 */
+        header {
+            text-align: center;
+            padding: 50px 20px 30px;
+            background-color: #fff;
+        }
+        .date-top {
+            font-size: 0.85rem;
+            color: #7da4c4;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-family: 'Nanum Myeongjo', serif;
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+        }
+        .couple-name {
+            font-size: 1.1rem;
+            margin: 0 0 10px 0;
+            color: #444;
+        }
+        .venue-top {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* 메인 사진 */
+        .hero-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 공통 섹션 타이틀 */
+        .sec-title {
+            font-family: 'Nanum Myeongjo', serif;
+            font-size: 1.2rem;
+            color: #7da4c4; /* 연한 하늘색 포인트 */
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        /* 초대글 */
+        .invitation p {
+            line-height: 2;
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .parents {
+            margin-top: 40px;
+            font-size: 1rem;
+            line-height: 1.8;
+            padding: 20px;
+            background-color: #f7fbff;
+            border-radius: 10px;
+        }
+        .parents strong {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        /* 갤러리 */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .gallery-grid img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #f0f0f0; /* 사진 없을 때 임시 배경 */
+        }
+
+        /* D-DAY 카운트다운 */
+        .countdown-box {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .time-unit {
+            background-color: #eef7fa;
+            color: #7da4c4;
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 50px;
+        }
+        .time-unit .num {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+            font-family: 'Nanum Myeongjo', serif;
+        }
+        .time-unit .label {
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+        .full-date {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        /* 오시는 길 */
+        .map-placeholder {
+            width: 100%;
+            height: 250px;
+            background-color: #eef7fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7da4c4;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- 헤더 -->
+        <header>
+            <div class="date-top">2026.12.26 SAT</div>
+            <h1>We Are Getting Married</h1>
+            <p class="couple-name">드미트리 &amp; 로렐라이</p>
+            <p class="venue-top">나나컨벤션센터 2층 플로렌스홀</p>
+        </header>
+
+        <!-- 메인 사진 -->
+        <img src="함께1.avif" alt="메인 웨딩 사진" class="hero-img" onerror="this.src='https://via.placeholder.com/480x600/eef7fa/7da4c4?text=함께1.png'">
+
+        <!-- 초대글 -->
+        <section class="invitation">
+            <div class="sec-title">INVITATION</div>
+            <p>초대합니다.</p>
+            <p>저희의 영원한 사랑을<br>깨지지 않는 약속으로 하늘에 아로새기어<br>서로의 동반자가 되어 인생의 여정을 출발하고자 합니다.</p>
+            <p>저희 두 사람의 약속이<br>더욱 빛날 수 있도록<br>부디 방문하시어 따뜻한 격려와 축복을 부탁드립니다.</p>
+            
+            <div class="parents">
+                루크사트 · 파르벤의 아들 <strong>드미트리</strong><br>
+                마키아토 · 페르시카의 딸 <strong>로렐라이</strong>
+            </div>
+        </section>
+
+        <!-- 갤러리 -->
+        <section class="gallery">
+            <div class="sec-title">GALLERY</div>
+            <div class="gallery-grid">
+                <!-- 이미지 파일 이름을 한국어로 설정 -->
+                <img src="신랑.jpg" alt="신랑 단독" onerror="this.src='https://via.placeholder.com/300x300/eef7fa/7da4c4?text=신랑.png'">
+                <img src="신부.avif" alt="신부 단독" onerror="this.src='https://via.placeholder.com/300x300/eef7fa/7da4c4?text=신부.png'">
+                <img src="함께2.avif" alt="커플 사진 2" onerror="this.src='https://via.placeholder.com/300x300/eef7fa/7da4c4?text=함께2.png'">
+                <img src="함께3.avif" alt="커플 사진 3" onerror="this.src='https://via.placeholder.com/300x300/eef7fa/7da4c4?text=함께3.png'">
+            </div>
+        </section>
+
+        <!-- D-DAY -->
+        <section class="d-day">
+            <div class="sec-title">D-DAY</div>
+            <div class="countdown-box" id="countdown">
+                <!-- 자바스크립트로 시간이 들어갑니다 -->
+            </div>
+            <p class="full-date">2026년 12월 26일 토요일 오후 12시</p>
+        </section>
+
+        <!-- 오시는 길 -->
+        <section class="location">
+            <div class="sec-title">LOCATION</div>
+            <p>나나컨벤션센터 2층 플로렌스홀</p>
+            <div class="map-placeholder" style="background: none; padding: 0;">
+    <img src="지도.svg.png" alt="오시는 길 지도" style="width: 100%; height: auto; border-radius: 10px; display: block;">
+</div>
+        </section>
+    </div>
+
+    <!-- 카운트다운 스크립트 -->
+    <script>
+        const countDownDate = new Date("Dec 26, 2026 12:00:00").getTime();
+
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("countdown").innerHTML = `
+                <div class="time-unit"><span class="num">${days}</span><span class="label">DAYS</span></div>
+                <div class="time-unit"><span class="num">${hours}</span><span class="label">HOUR</span></div>
+                <div class="time-unit"><span class="num">${minutes}</span><span class="label">MIN</span></div>
+                <div class="time-unit"><span class="num">${seconds}</span><span class="label">SEC</span></div>
+            `;
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countdown").innerHTML = "결혼식이 종료되었습니다.";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
