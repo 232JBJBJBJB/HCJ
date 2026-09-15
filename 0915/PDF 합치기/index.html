@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge PDF</title>
+    <!-- pdf-lib CDN 추가: 서버 없이 자바스크립트만으로 PDF를 병합하기 위한 라이브러리 -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        /* 애플 스타일 폰트 적용 */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            /* 하늘색 그라데이션 테마 */
+            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            --box-bg: rgba(255, 255, 255, 0.9);
+            --box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(14, 165, 233, 0.3);
+            --primary-color: #0ea5e9;
+            --primary-hover: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 헤더 영역 (로고 없이 텍스트만) */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .header-left {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .header-right {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 50px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 타이틀 영역 */
+        .title-area {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .title-area h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .title-area p {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            color: #334155;
+        }
+
+        .title-area .sub-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* 업로드/드롭존 박스 */
+        .app-box {
+            width: 100%;
+            background: var(--box-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .dropzone {
+            width: 100%;
+            padding: 40px 20px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(224, 242, 254, 0.3);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            background: rgba(224, 242, 254, 0.8);
+            border-color: var(--primary-hover);
+        }
+
+        .dropzone input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .dropzone h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .btn-browse {
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-browse:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 파일 목록 영역 */
+        .file-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #334155;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80%;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* 합치기 버튼 */
+        .btn-merge {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none; /* 파일이 2개 이상일 때만 표시 */
+        }
+
+        .btn-merge:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-merge:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">Been Lab</div>
+        <div class="header-right">Merge PDF</div>
+    </header>
+
+    <div class="container">
+        <div class="title-area">
+            <h1>Merge Your PDFs!</h1>
+            <p>Drag and drop your files in the box below to combine them into one.</p>
+            <p class="sub-desc">100% Secure. All processing happens locally on your browser. No data is sent to any server.</p>
+        </div>
+
+        <div class="app-box">
+            <div class="dropzone" id="dropzone">
+                <input type="file" id="file-input" multiple accept=".pdf">
+                <div class="upload-icon">☁️</div>
+                <h3>Drag & Drop PDF files here</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin: 0;">or click to browse</p>
+                <button class="btn-browse">Browse Files</button>
+            </div>
+
+            <div class="file-list" id="file-list">
+                <!-- 추가된 파일 목록이 여기에 표시됩니다 -->
+            </div>
+
+            <button class="btn-merge" id="btn-merge">Merge Files</button>
+        </div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const fileListContainer = document.getElementById('file-list');
+        const btnMerge = document.getElementById('btn-merge');
+
+        let pdfFiles = []; // 선택된 파일들을 담을 배열
+
+        // 파일 선택/드롭 이벤트 처리
+        dropzone.addEventListener('click', () => fileInput.click());
+        
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+            fileInput.value = ''; // 재선택 가능하게 초기화
+        });
+
+        // 파일 처리 로직
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type === 'application/pdf') {
+                    pdfFiles.push(file);
+                } else {
+                    alert(`${file.name}은(는) PDF 파일이 아닙니다.`);
+                }
+            });
+            updateFileListUI();
+        }
+
+        // 파일 목록 UI 업데이트
+        function updateFileListUI() {
+            fileListContainer.innerHTML = '';
+            
+            pdfFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <div class="file-name">${index + 1}. ${file.name}</div>
+                    <button class="btn-remove" onclick="removeFile(event, ${index})" title="삭제">×</button>
+                `;
+                fileListContainer.appendChild(item);
+            });
+
+            // 파일이 2개 이상일 때만 병합 버튼 표시
+            if (pdfFiles.length > 1) {
+                btnMerge.style.display = 'block';
+            } else {
+                btnMerge.style.display = 'none';
+            }
+        }
+
+        // 파일 제거 함수
+        window.removeFile = function(event, index) {
+            event.stopPropagation(); // 드롭존 클릭 이벤트 방지
+            pdfFiles.splice(index, 1);
+            updateFileListUI();
+        };
+
+        // PDF 병합 로직 (pdf-lib 활용)
+        btnMerge.addEventListener('click', async () => {
+            if (pdfFiles.length < 2) return;
+
+            try {
+                btnMerge.disabled = true;
+                btnMerge.textContent = 'Merging... Please wait';
+
+                // 새 PDF 문서 생성
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+
+                // 선택된 파일들을 순회하며 페이지 복사
+                for (const file of pdfFiles) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(arrayBuffer);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+
+                // 합쳐진 PDF 저장
+                const mergedPdfFile = await mergedPdf.save();
+                
+                // 다운로드 트리거
+                const blob = new Blob([mergedPdfFile], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Merged_Document.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // 작업 완료 후 초기화
+                pdfFiles = [];
+                updateFileListUI();
+                alert('PDF 병합이 완료되었습니다!');
+
+            } catch (error) {
+                console.error(error);
+                alert('PDF 병합 중 오류가 발생했습니다. 암호가 걸려있는지 확인해 주세요.');
+            } finally {
+                btnMerge.disabled = false;
+                btnMerge.textContent = 'Merge Files';
+            }
+        });
+    </script>
+</body>
+</html>

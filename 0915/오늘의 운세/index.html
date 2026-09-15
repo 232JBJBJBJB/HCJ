@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JB - 오늘의 운세</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+
+        :root {
+            --bg-color: #f0f4f8;
+            --box-bg: #ffffff;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --element-hover: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 헤더 영역 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: var(--box-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .header-left .logo-icon {
+            background: var(--text-main);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .header-right {
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        /* 메인 콘텐츠 */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .fortune-card {
+            background: var(--box-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+        }
+
+        .title-section p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* 입력 폼 영역 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        /* 성별 선택 버튼 */
+        .gender-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .gender-btn.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+        }
+
+        /* 원소 선택 영역 */
+        .element-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .element-section h3 {
+            font-size: 1.1rem;
+            margin: 0 0 5px 0;
+        }
+
+        .element-section p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0 0 20px 0;
+        }
+
+        .element-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .element-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .element-item:hover {
+            background: var(--element-hover);
+        }
+
+        .element-item.active {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .element-icon {
+            font-size: 1.8rem;
+        }
+
+        .element-name {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* 결과 확인 버튼 및 결과창 */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-box h4 {
+            margin: 0 0 15px 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .result-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <span class="logo-icon">JB</span>
+            JB
+        </div>
+        <div class="header-right">
+            JB
+        </div>
+    </header>
+
+    <main>
+        <div class="fortune-card">
+            <div class="title-section">
+                <h2>오늘의 운세</h2>
+                <p>당신의 기운을 담아 오늘의 운세를 확인해보세요.</p>
+            </div>
+
+            <!-- 정보 입력 폼 -->
+            <div class="form-group">
+                <label>이름</label>
+                <input type="text" id="user-name" class="form-control" placeholder="이름을 입력하세요">
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label>생일</label>
+                    <input type="date" id="user-birth" class="form-control">
+                </div>
+                <div class="col form-group">
+                    <label>나이</label>
+                    <input type="number" id="user-age" class="form-control" placeholder="세">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>성별</label>
+                <div class="gender-group">
+                    <div class="gender-btn" onclick="selectGender(this, '남성')">남성</div>
+                    <div class="gender-btn" onclick="selectGender(this, '여성')">여성</div>
+                    <div class="gender-btn" onclick="selectGender(this, '기타')">기타</div>
+                </div>
+            </div>
+
+            <!-- 원소 선택 -->
+            <div class="element-section">
+                <h3>당신의 원소를 선택하세요</h3>
+                <p>마음이 끌리는 하나의 원소를 선택해주세요</p>
+                
+                <div class="element-grid">
+                    <div class="element-item" onclick="selectElement(this, '불')">
+                        <span class="element-icon">🔥</span>
+                        <span class="element-name">불</span>
+                    </div>
+                    <div class="element-item" onclick="selectElement(this, '물')">
+                        <span class="element-icon">💧</span>
+                        <span class="element-name">물</span>
+                    </div>
+                    <div class="element-item" onclick="selectElement(this, '나무')">
+                        <span class="element-icon">🌳</span>
+                        <span class="element-name">나무</span>
+                    </div>
+                    <div class="element-item" onclick="selectElement(this, '땅')">
+                        <span class="element-icon">🌍</span>
+                        <span class="element-name">땅</span>
+                    </div>
+                    <div class="element-item" onclick="selectElement(this, '바람')">
+                        <span class="element-icon">💨</span>
+                        <span class="element-name">바람</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-btn" onclick="showFortune()">운세 확인하기</button>
+
+            <!-- 결과 출력창 -->
+            <div class="result-box" id="result-box">
+                <h4>🔮 <span id="res-name"></span>님의 오늘의 운세</h4>
+                <p class="result-text" id="res-text"></p>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let selectedGender = '';
+        let selectedElement = '';
+
+        // 성별 선택 로직
+        function selectGender(element, gender) {
+            document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            selectedGender = gender;
+        }
+
+        // 원소 선택 로직
+        function selectElement(element, elementName) {
+            document.querySelectorAll('.element-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            selectedElement = elementName;
+        }
+
+        // 운세 데이터 (원소별로 다른 랜덤 결과)
+        const fortuneData = {
+            '불': [
+                "오늘은 열정이 넘치는 하루야! 망설이던 일이 있다면 과감하게 도전해 봐.",
+                "당신의 따뜻한 에너지가 주변 사람들에게 큰 힘이 될 거야. 대인관계가 아주 좋은 날!",
+                "빠른 결단력이 필요한 순간이 올 거야. 직감을 믿고 나아가면 좋은 결과가 있을 거야."
+            ],
+            '물': [
+                "물 흐르듯 자연스럽게 일이 풀리는 날이야. 스트레스 받지 말고 여유를 가져봐.",
+                "당신의 유연함이 빛을 발하는 하루! 예상치 못한 문제도 부드럽게 해결할 수 있어.",
+                "감수성이 풍부해지는 날이야. 예술적인 활동이나 취미에 시간을 투자하면 큰 기쁨을 얻을 거야."
+            ],
+            '나무': [
+                "나무처럼 꾸준히 성장하는 기운이 가득해! 오늘 배운 것은 앞으로 큰 자산이 될 거야.",
+                "뿌리를 깊게 내리듯 기초를 탄탄히 다지기 좋은 날이야. 서두르지 말고 차근차근 진행해.",
+                "새로운 인연이 피어날 수 있어. 누군가에게 먼저 도움의 손길을 내밀어 보는 건 어떨까?"
+            ],
+            '땅': [
+                "대지처럼 든든하고 안정적인 하루가 될 거야. 계획했던 일들이 차질 없이 진행될 거야.",
+                "재물운이 상승하는 날! 생각지도 못한 작은 이득이나 기분 좋은 소식을 들을 수 있어.",
+                "주변 사람들에게 든든한 버팀목이 되어줄 수 있는 날이야. 당신의 성실함이 인정받을 거야."
+            ],
+            '바람': [
+                "바람처럼 자유롭고 상쾌한 하루! 새로운 소식이나 기분 좋은 변화가 당신을 찾아올 거야.",
+                "어디론가 훌쩍 떠나고 싶어질지도 몰라. 가벼운 산책이나 짧은 드라이브가 행운을 가져다줄 거야.",
+                "막혀있던 아이디어가 시원하게 뚫리는 날이야. 창의적인 생각을 마음껏 펼쳐봐!"
+            ]
+        };
+
+        // 운세 확인 실행 로직
+        function showFortune() {
+            const name = document.getElementById('user-name').value;
+            const birth = document.getElementById('user-birth').value;
+            const age = document.getElementById('user-age').value;
+
+            // 유효성 검사
+            if (!name || !birth || !age || !selectedGender) {
+                alert("이름, 생일, 나이, 성별을 모두 입력해주세요!");
+                return;
+            }
+            if (!selectedElement) {
+                alert("당신의 원소를 하나 선택해주세요!");
+                return;
+            }
+
+            // 랜덤 운세 뽑기
+            const elementFortunes = fortuneData[selectedElement];
+            const randomIndex = Math.floor(Math.random() * elementFortunes.length);
+            const todayFortune = elementFortunes[randomIndex];
+
+            // 결과 화면에 출력
+            document.getElementById('res-name').innerText = name;
+            
+            // 원소와 성별 등을 조합한 멘트 출력
+            const finalMessage = `[${selectedElement}의 기운을 선택한 ${age}세 ${selectedGender}]<br><br>${todayFortune}`;
+            document.getElementById('res-text').innerHTML = finalMessage;
+
+            // 결과창 표시
+            const resultBox = document.getElementById('result-box');
+            resultBox.style.display = 'block';
+            
+            // 결과창으로 스크롤 부드럽게 이동
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>

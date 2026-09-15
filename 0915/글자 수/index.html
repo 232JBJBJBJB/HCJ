@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Been - Count Words</title>
+    <style>
+        /* 애플 스타일의 공적이고 깔끔한 폰트 스택 적용 */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        :root {
+            /* 연한 하늘색 그라데이션 테마 */
+            --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            --box-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #1d1d1f; /* 애플 스타일의 짙은 회색 */
+            --text-muted: #86868b;
+            --border-color: #d2d2d7;
+            --primary-color: #0071e3;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, "Noto Sans KR", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 헤더 영역 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        .header-left img {
+            height: 28px;
+            border-radius: 4px;
+        }
+
+        .header-right {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* 메인 콘텐츠 */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .counter-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 텍스트 입력 영역 */
+        textarea {
+            width: 100%;
+            height: 350px;
+            padding: 40px;
+            border: none;
+            resize: none;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            background: transparent;
+            outline: none;
+        }
+
+        textarea::placeholder {
+            color: #a1a1a6;
+        }
+
+        /* 결과 표시 영역 */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: rgba(0, 113, 227, 0.03);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 15px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            .stat-item {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 15px;
+            }
+            .stat-item:last-child {
+                border-bottom: none;
+            }
+            textarea {
+                padding: 20px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="header-left">
+            <!-- 임시 로고 대체용 텍스트/이미지 영역 -->
+            <img src="이미지.png" alt="Been 로고" onerror="this.src='https://via.placeholder.com/28x28/0071e3/ffffff?text=B'">
+            Been
+        </a>
+        <div class="header-right">
+            Count Words
+        </div>
+    </header>
+
+    <main>
+        <div class="counter-container">
+            <textarea id="text-input" placeholder="여기에 텍스트를 입력하거나 붙여넣으세요..."></textarea>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="count-chars">0</div>
+                    <div class="stat-label">Characters</div>
+                    <div class="stat-sub">(글자 수)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="count-bytes">0</div>
+                    <div class="stat-label">Bytes</div>
+                    <div class="stat-sub">(바이트)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="count-nospaces">0</div>
+                    <div class="stat-label">Characters w/o Space</div>
+                    <div class="stat-sub">(공백 제외)</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const textInput = document.getElementById('text-input');
+        const countChars = document.getElementById('count-chars');
+        const countBytes = document.getElementById('count-bytes');
+        const countNospaces = document.getElementById('count-nospaces');
+
+        // 실시간 글자 수 세기 로직
+        textInput.addEventListener('input', () => {
+            const text = textInput.value;
+
+            // 1. 글자 수 (Characters)
+            countChars.textContent = text.length.toLocaleString();
+
+            // 2. 바이트 수 (Bytes) - 한글은 2바이트로 계산하도록 명시된 조건 적용
+            let bytes = 0;
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                // 아스키 코드(영어, 숫자, 기본 기호)는 1바이트, 그 외(한글 등)는 2바이트 처리
+                if (charCode <= 0x00007F) {
+                    bytes += 1;
+                } else {
+                    bytes += 2;
+                }
+            }
+            countBytes.textContent = bytes.toLocaleString();
+
+            // 3. 공백 제외 글자 수 (Characters w/o Space)
+            const textNoSpaces = text.replace(/\s/g, ''); // 띄어쓰기, 줄바꿈 모두 제거
+            countNospaces.textContent = textNoSpaces.length.toLocaleString();
+        });
+    </script>
+</body>
+</html>

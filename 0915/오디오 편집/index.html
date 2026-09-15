@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Been - Audio Edit & Convert</title>
+    <style>
+        /* 애플 스타일의 깔끔한 폰트 스택 */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            /* 진한 하늘색 그라데이션 테마 (Deep Sky / Ocean Blue) */
+            --bg-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            --box-bg: #ffffff;
+            --box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary-color: #0284c7;
+            --primary-hover: #0369a1;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 헤더 영역 */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(2, 132, 199, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .header-left {
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 공통 앱 박스 */
+        .app-box {
+            width: 100%;
+            background: var(--box-bg);
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: var(--box-shadow);
+        }
+
+        /* ================= 1. 업로드 화면 ================= */
+        #upload-screen {
+            display: block;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        #upload-screen h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: #111827;
+        }
+
+        #upload-screen p {
+            color: var(--text-muted);
+            margin: 0 0 30px 0;
+            font-size: 0.95rem;
+        }
+
+        .dropzone {
+            width: 100%;
+            padding: 50px 20px;
+            border: 2px dashed #bae6fd;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f0f9ff;
+        }
+
+        .dropzone:hover {
+            background: #e0f2fe;
+            border-color: var(--primary-color);
+        }
+
+        .dropzone input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .dropzone h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        /* ================= 2. 편집 스튜디오 화면 ================= */
+        #editor-screen {
+            display: none;
+        }
+
+        .editor-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .btn-back {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #374151;
+            transition: background 0.2s;
+        }
+        .btn-back:hover { background: #e5e7eb; }
+
+        .controls-inline {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .volume-control input[type="range"] {
+            width: 100px;
+        }
+
+        /* 파일 이름 표시 영역 */
+        .file-title-display {
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #4b5563;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* 파형(Waveform) 시각화 박스 */
+        .waveform-container {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            background: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .trim-overlay-info {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            color: #38bdf8;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* 하단 오디오 컨트롤 바 */
+        .audio-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .left-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-play {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-play:hover { background: var(--primary-hover); }
+
+        .time-display {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .format-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-weight: 600;
+            background: white;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save:hover { background: #334155; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">Been</div>
+        <div class="header-right">Audio Edit & Convert</div>
+    </header>
+
+    <div class="container">
+        <div class="app-box">
+            
+            <!-- 1. 업로드 화면 -->
+            <div id="upload-screen">
+                <h1>Audio Edit & Convert</h1>
+                <p>MP3, WAV 등 오디오 파일을 업로드하고 간편하게 편집하세요.</p>
+                
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="file-input" accept="audio/*">
+                    <div class="upload-icon">🎵</div>
+                    <h3>Drag & Drop your audio file here</h3>
+                    <p style="margin-top: 5px; font-size: 0.85rem;">or click to browse (.mp3, .wav, .ogg)</p>
+                </div>
+            </div>
+
+            <!-- 2. 편집 스튜디오 화면 -->
+            <div id="editor-screen">
+                <div class="editor-top-bar">
+                    <button class="btn-back" id="btn-back">← Back</button>
+                    <div class="controls-inline">
+                        <div class="volume-control">
+                            <span>🔊 Volume</span>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1">
+                            <span id="volume-val" style="min-width: 35px;">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="file-title-display" id="file-title-display">audio_file.mp3</div>
+
+                <!-- 파형 및 트리밍 영역 -->
+                <div class="waveform-container">
+                    <div class="trim-overlay-info">Trim Range: <span id="trim-range-text">0.00s - 0.00s</span></div>
+                    <canvas id="waveform-canvas"></canvas>
+                </div>
+
+                <!-- 오디오 제어 및 포맷 변환/저장 바 -->
+                <div class="audio-action-bar">
+                    <div class="left-actions">
+                        <button class="btn-play" id="btn-play">▶</button>
+                        <div class="time-display">
+                            <span id="curr-time">00:00.000</span> / <span id="total-time">00:00.000</span>
+                        </div>
+                    </div>
+
+                    <div class="right-actions">
+                        <select class="format-select" id="format-select">
+                            <option value="wav">WAV</option>
+                            <option value="mp3">MP3</option>
+                            <option value="ogg">OGG</option>
+                        </select>
+                        <button class="btn-save" id="btn-save">Save Output</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 숨겨진 오디오 엘리먼트 -->
+    <audio id="audio-element" style="display: none;"></audio>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const uploadScreen = document.getElementById('upload-screen');
+        const editorScreen = document.getElementById('editor-screen');
+        const btnBack = document.getElementById('btn-back');
+        const fileTitleDisplay = document.getElementById('file-title-display');
+        
+        const audioElement = document.getElementById('audio-element');
+        const btnPlay = document.getElementById('btn-play');
+        const currTimeEl = document.getElementById('curr-time');
+        const totalTimeEl = document.getElementById('total-time');
+        
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumeVal = document.getElementById('volume-val');
+        const formatSelect = document.getElementById('format-select');
+        const btnSave = document.getElementById('btn-save');
+        
+        const canvas = document.getElementById('waveform-canvas');
+        const ctx = canvas.getContext('2d');
+        const trimRangeText = document.getElementById('trim-range-text');
+
+        let audioCtx;
+        let audioBuffer;
+        let objectUrl;
+        let trimStart = 0;
+        let trimEnd = 0;
+        let isDragging = false;
+        let dragHandle = null; // 'start' 또는 'end'
+
+        // 업로드 이벤트
+        dropzone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) loadAudioFile(e.target.files[0]);
+        });
+
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.background = '#e0f2fe'; });
+        dropzone.addEventListener('dragleave', () => { dropzone.style.background = '#f0f9ff'; });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length > 0) loadAudioFile(e.dataTransfer.files[0]);
+        });
+
+        // 오디오 파일 로드 및 Web Audio API 파싱
+        function loadAudioFile(file) {
+            fileTitleDisplay.textContent = file.name;
+            objectUrl = URL.createObjectURL(file);
+            audioElement.src = objectUrl;
+
+            // HTML5 Audio 세팅
+            audioElement.onloadedmetadata = () => {
+                totalTimeEl.textContent = formatTime(audioElement.duration);
+                trimStart = 0;
+                trimEnd = audioElement.duration;
+                updateTrimText();
+                drawWaveformDummy();
+            };
+
+            // Web Audio API로 오디오 버퍼 읽기 (파형 시각화용)
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = async function(e) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    audioBuffer = await audioCtx.decodeAudioData(e.target.result);
+                    drawWaveform();
+                } catch(err) {
+                    console.error("오디오 파형 디코딩 에러:", err);
+                    drawWaveformDummy();
+                }
+            };
+
+            // 화면 전환
+            uploadScreen.style.display = 'none';
+            editorScreen.style.display = 'block';
+        }
+
+        // 캔버스 크기 맞추기 및 파형 그리기
+        function drawWaveform() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            const rawData = audioBuffer.getChannelData(0);
+            const samples = 150; // 파형 막대 개수
+            const blockSz = Math.floor(rawData.length / samples);
+            const filteredData = [];
+
+            for (let i = 0; i < samples; i++) {
+                let blockStart = blockSz * i;
+                let sum = 0;
+                for (let j = 0; j < blockSz; j++) {
+                    sum += Math.abs(rawData[blockStart + j]);
+                }
+                filteredData.push(sum / blockSz);
+            }
+
+            renderWaveformCanvas(filteredData);
+        }
+
+        function drawWaveformDummy() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const dummy = Array.from({length: 150}, () => Math.random() * 0.7 + 0.1);
+            renderWaveformCanvas(dummy);
+        }
+
+        function renderWaveformCanvas(data) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            const barWidth = width / data.length;
+
+            // 파형 바 그리기
+            data.forEach((val, i) => {
+                const x = i * barWidth;
+                const barHeight = val * height * 0.8;
+                const y = (height - barHeight) / 2;
+
+                // 트림 구간 내외에 따라 색상 다르게 부여
+                const timeRatio = i / data.length;
+                const currentTime = timeRatio * audioElement.duration;
+                
+                if (currentTime >= trimStart && currentTime <= trimEnd) {
+                    ctx.fillStyle = '#38bdf8'; // 활성 구간 (하늘색)
+                } else {
+                    ctx.fillStyle = '#334155'; // 비활성 구간 (어두운 회색)
+                }
+                ctx.fillRect(x, y, barWidth - 2, barHeight);
+            });
+
+            // 시작 및 끝 트리밍 핸들선 그리기
+            const startX = (trimStart / audioElement.duration) * width;
+            const endX = (trimEnd / audioElement.duration) * width;
+
+            ctx.fillStyle = '#f43f5e'; // 빨간색 핸들 라인
+            ctx.fillRect(startX - 2, 0, 4, height);
+            ctx.fillRect(endX - 2, 0, 4, height);
+        }
+
+        // 파형 마우스 인터랙션으로 Trim 구간 조절
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickRatio = clickX / canvas.width;
+            const clickTime = clickRatio * audioElement.duration;
+
+            // 시작 핸들과 끝 핸들 중 가까운 쪽 선택
+            if (Math.abs(clickTime - trimStart) < Math.abs(clickTime - trimEnd)) {
+                dragHandle = 'start';
+            } else {
+                dragHandle = 'end';
+            }
+            isDragging = true;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging || !audioElement.duration) return;
+            const rect = canvas.getBoundingClientRect();
+            let moveX = e.clientX - rect.left;
+            moveX = Math.max(0, Math.min(moveX, canvas.width));
+            const moveTime = (moveX / canvas.width) * audioElement.duration;
+
+            if (dragHandle === 'start' && moveTime < trimEnd) {
+                trimStart = moveTime;
+            } else if (dragHandle === 'end' && moveTime > trimStart) {
+                trimEnd = moveTime;
+            }
+            updateTrimText();
+            if (audioBuffer) drawWaveform();
+            else drawWaveformDummy();
+        });
+
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        function updateTrimText() {
+            trimRangeText.textContent = `${trimStart.toFixed(2)}s - ${trimEnd.toFixed(2)}s`;
+        }
+
+        // 재생/일시정지 버튼
+        btnPlay.addEventListener('click', () => {
+            if (audioElement.paused) {
+                audioElement.currentTime = trimStart; // 트림 시작 지점부터 재생
+                audioElement.play();
+                btnPlay.textContent = '⏸';
+            } else {
+                audioElement.pause();
+                btnPlay.textContent = '▶';
+            }
+        });
+
+        // 재생 시간 업데이트 실시간 반영 및 트림 끝 지점 도달 시 정지
+        audioElement.ontimeupdate = () => {
+            currTimeEl.textContent = formatTime(audioElement.currentTime);
+            if (audioElement.currentTime >= trimEnd) {
+                audioElement.pause();
+                btnPlay.textContent = '▶';
+            }
+        };
+
+        // 볼륨 조절
+        volumeSlider.addEventListener('input', (e) => {
+            const vol = parseFloat(e.target.value);
+            audioElement.volume = vol;
+            volumeVal.textContent = Math.round(vol * 100) + '%';
+        });
+
+        // 포맷 변환 및 저장 버튼 시뮬레이션
+        btnSave.addEventListener('click', () => {
+            const format = formatSelect.value.toUpperCase();
+            const duration = (trimEnd - trimStart).toFixed(2);
+            alert(`[포맷 변환 완료]\n포맷: ${format}\n구간: ${trimStart.toFixed(2)}s ~ ${trimEnd.toFixed(2)}s (총 ${duration초}) 설정으로 출력 파일이 생성되었습니다!`);
+        });
+
+        // 뒤로 가기
+        btnBack.addEventListener('click', () => {
+            audioElement.pause();
+            btnPlay.textContent = '▶';
+            editorScreen.style.display = 'none';
+            uploadScreen.style.display = 'block';
+        });
+
+        // 시간 포맷터 (00:00.000 형태)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            const millis = Math.floor((seconds % 1) * 1000);
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(millis).padStart(3, '0')}`;
+        }
+    </script>
+</body>
+</html>

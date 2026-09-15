@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Been - Keep Fit! BMI 계산기</title>
+    <style>
+        /* 애플 스타일의 깔끔한 폰트 스택 */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            /* 벚꽃색 그라데이션 테마 */
+            --bg-gradient: linear-gradient(135deg, #fdf2f8 0%, #fbcfe8 100%);
+            --box-bg: rgba(255, 255, 255, 0.95);
+            --box-shadow: 0 10px 40px rgba(244, 114, 182, 0.15);
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --border-color: #fce7f3;
+            --primary-color: #f472b6;
+            --primary-hover: #db2777;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 헤더 영역 */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .header-left {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-hover);
+        }
+
+        .header-right {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-box {
+            width: 100%;
+            background: var(--box-bg);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* 입력 폼 화면 */
+        #input-screen h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin: 0 0 5px 0;
+            color: #111827;
+        }
+
+        #input-screen p {
+            text-align: center;
+            color: var(--text-muted);
+            margin: 0 0 30px 0;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+        }
+
+        .gender-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .gender-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        /* 결과 화면 */
+        #result-screen {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bmi-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .bmi-score {
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -1px;
+            color: #111827;
+        }
+
+        .bmi-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* 뱃지 상태별 컬러 */
+        .status-under { background: #bae6fd; color: #0369a1; }
+        .status-normal { background: #bbf7d0; color: #166534; }
+        .status-over { background: #fef08a; color: #854d0e; }
+        .status-obese { background: #fecaca; color: #991b1b; }
+
+        /* 타겟 분석 섹션 */
+        .analysis-section {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+
+        .analysis-title {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .target-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .target-row:last-child {
+            border-bottom: none;
+        }
+
+        .target-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-label strong {
+            font-size: 1rem;
+            color: #111827;
+        }
+
+        .target-label span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .target-value {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-value strong {
+            font-size: 1.1rem;
+            color: #111827;
+        }
+
+        .target-value span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .text-lose { color: #2563eb; } /* 빼야 함 (파란색) */
+        .text-gain { color: #dc2626; } /* 찌워야 함 (빨간색) */
+        .text-keep { color: #166534; } /* 유지 (초록색) */
+
+        .btn-back {
+            width: 100%;
+            background: #f3f4f6;
+            color: #4b5563;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 30px;
+        }
+
+        .btn-back:hover {
+            background: #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">Been</div>
+        <div class="header-right">Keep Fit!</div>
+    </header>
+
+    <div class="container">
+        <div class="app-box">
+            
+            <!-- 입력 화면 -->
+            <div id="input-screen">
+                <h1>BMI 계산기</h1>
+                <p>성별, 키, 몸무게를 입력해 주세요.</p>
+
+                <div class="form-group">
+                    <label>성별</label>
+                    <div class="gender-group">
+                        <div class="gender-btn active" data-val="male" onclick="setGender(this)">남성</div>
+                        <div class="gender-btn" data-val="female" onclick="setGender(this)">여성</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>키 (cm)</label>
+                    <input type="number" id="input-height" class="form-control" placeholder="예: 175">
+                </div>
+
+                <div class="form-group">
+                    <label>몸무게 (kg)</label>
+                    <input type="number" id="input-weight" class="form-control" placeholder="예: 70">
+                </div>
+
+                <button class="btn-submit" onclick="calculateBMI()">결과 확인하기</button>
+            </div>
+
+            <!-- 결과 화면 -->
+            <div id="result-screen">
+                <div class="bmi-header">
+                    <h2 class="bmi-score" id="res-score">22.9</h2>
+                    <div class="bmi-badge status-normal" id="res-badge">정상 (Normal)</div>
+                </div>
+
+                <div class="analysis-section">
+                    <div class="analysis-title">목표 체중 분석 (TARGET ANALYSIS)</div>
+                    
+                    <!-- 90% 목표 -->
+                    <div class="target-row">
+                        <div class="target-label">
+                            <strong>90% 목표</strong>
+                            <span>표준 체중의 90%</span>
+                        </div>
+                        <div class="target-value">
+                            <strong id="w-90">60.6 kg</strong>
+                            <span id="d-90" class="text-lose">-9.4 kg 빼야 함 (Lose)</span>
+                        </div>
+                    </div>
+
+                    <!-- 100% 표준 -->
+                    <div class="target-row">
+                        <div class="target-label">
+                            <strong>100% 표준</strong>
+                            <span>표준 체중 (Ideal)</span>
+                        </div>
+                        <div class="target-value">
+                            <strong id="w-100">67.4 kg</strong>
+                            <span id="d-100" class="text-lose">-2.6 kg 빼야 함 (Lose)</span>
+                        </div>
+                    </div>
+
+                    <!-- 110% 여유 -->
+                    <div class="target-row">
+                        <div class="target-label">
+                            <strong>110% 여유</strong>
+                            <span>표준 체중의 110%</span>
+                        </div>
+                        <div class="target-value">
+                            <strong id="w-110">74.1 kg</strong>
+                            <span id="d-110" class="text-gain">+4.1 kg 찌워야 함 (Gain)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-back" onclick="goBack()">다시 계산하기</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let selectedGender = 'male';
+
+        // 성별 선택 로직
+        function setGender(el) {
+            document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            selectedGender = el.getAttribute('data-val');
+        }
+
+        // BMI 및 목표 체중 계산 로직
+        function calculateBMI() {
+            const hInput = parseFloat(document.getElementById('input-height').value);
+            const wInput = parseFloat(document.getElementById('input-weight').value);
+
+            if (!hInput || !wInput) {
+                alert("키와 몸무게를 정확히 입력해 주세요.");
+                return;
+            }
+
+            const hMeters = hInput / 100;
+            const currentWeight = wInput;
+
+            // 1. BMI 계산
+            const bmi = currentWeight / (hMeters * hMeters);
+            document.getElementById('res-score').textContent = bmi.toFixed(1);
+
+            // BMI 상태 판별 (한국 기준)
+            const badge = document.getElementById('res-badge');
+            if (bmi < 18.5) {
+                badge.textContent = "저체중 (Underweight)";
+                badge.className = "bmi-badge status-under";
+            } else if (bmi < 23) {
+                badge.textContent = "정상 (Normal)";
+                badge.className = "bmi-badge status-normal";
+            } else if (bmi < 25) {
+                badge.textContent = "과체중 (Overweight)";
+                badge.className = "bmi-badge status-over";
+            } else {
+                badge.textContent = "비만 (Obese)";
+                badge.className = "bmi-badge status-obese";
+            }
+
+            // 2. 표준 체중 계산 (남성: 키(m)^2 * 22, 여성: 키(m)^2 * 21)
+            const standardWeight = selectedGender === 'male' 
+                                   ? (hMeters * hMeters * 22) 
+                                   : (hMeters * hMeters * 21);
+
+            // 3. 목표 분석 데이터 렌더링
+            renderTargetRow(90, standardWeight * 0.9, currentWeight);
+            renderTargetRow(100, standardWeight * 1.0, currentWeight);
+            renderTargetRow(110, standardWeight * 1.1, currentWeight);
+
+            // 화면 전환
+            document.getElementById('input-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+        }
+
+        // 개별 타겟(90%, 100%, 110%) 행 렌더링 함수
+        function renderTargetRow(percent, targetWeight, currentWeight) {
+            const diff = targetWeight - currentWeight;
+            
+            document.getElementById(`w-${percent}`).textContent = targetWeight.toFixed(1) + " kg";
+            
+            const dElem = document.getElementById(`d-${percent}`);
+            if (Math.abs(diff) < 0.1) {
+                dElem.textContent = "현재 체중과 일치 (Keep)";
+                dElem.className = "text-keep";
+            } else if (diff < 0) {
+                // 빼야 하는 경우
+                dElem.textContent = `${diff.toFixed(1)} kg 빼야 함 (Lose)`;
+                dElem.className = "text-lose";
+            } else {
+                // 찌워야 하는 경우
+                dElem.textContent = `+${diff.toFixed(1)} kg 찌워야 함 (Gain)`;
+                dElem.className = "text-gain";
+            }
+        }
+
+        // 다시 계산하기 버튼
+        function goBack() {
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('input-screen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
