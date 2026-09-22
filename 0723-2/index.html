@@ -146,6 +146,29 @@
             font-weight: 600;
             color: #000;
         }
+
+        /* --- PDF 인쇄 최적화 스타일 추가 --- */
+        @media print {
+            body {
+                background-color: #fff;
+            }
+            .container {
+                padding: 20px 30px !important;
+                max-width: 100% !important;
+            }
+            header {
+                margin-bottom: 40px !important;
+            }
+            .project {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                margin-bottom: 40px !important;
+            }
+            .image-single img, .image-box img {
+                max-height: 220px !important;
+                object-fit: contain !important;
+            }
+        }
     </style>
 </head>
 <body>
