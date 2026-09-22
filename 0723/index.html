@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,8 +44,8 @@
             color: #fff;
         }
         
-        /* 일본어 텍스트 기본 숨김 */
-        .lang-ja {
+        /* 한국어 텍스트 기본 숨김 (초기 언어: 일본어) */
+        .lang-ko {
             display: none;
         }
 
@@ -224,10 +224,10 @@
 </head>
 <body>
 
-    <!-- 언어 전환 버튼 -->
+    <!-- 언어 전환 버튼 (기본값: 日本語 active) -->
     <div class="lang-switch">
-        <button id="btn-ko" class="lang-btn active" onclick="setLanguage('ko')">한국어</button>
-        <button id="btn-ja" class="lang-btn" onclick="setLanguage('ja')">日本語</button>
+        <button id="btn-ja" class="lang-btn active" onclick="setLanguage('ja')">日本語</button>
+        <button id="btn-ko" class="lang-btn" onclick="setLanguage('ko')">한국어</button>
     </div>
 
     <div class="container">
@@ -426,7 +426,7 @@
         </section>
     </div>
 
-    <!-- 언어 전환 스크립트 -->
+    <!-- 언어 전환 스크립트 (기본 실행: 일본어 'ja') -->
     <script>
         function setLanguage(lang) {
             // 버튼 활성화 상태 변경
@@ -452,6 +452,11 @@
                 document.querySelectorAll('span.lang-ja, a.lang-ja').forEach(el => el.style.display = 'inline');
             }
         }
+
+        // 페이지 로드 완료 시 일본어로 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            setLanguage('ja');
+        });
     </script>
 </body>
 </html>
